@@ -1,0 +1,36 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python bin directory
+python-bin/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+backend/chats.db
+
+# Environment variables / secrets
+.env
+
+# Logs
+*.log
+install_log_*.txt
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

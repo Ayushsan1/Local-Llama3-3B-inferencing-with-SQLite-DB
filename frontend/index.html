@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Local AI Inference System</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Markdown parser for high-quality bubble rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <div id="toast" class="toast"></div>
+
+    <!-- 1. Sidebar Panel Layout -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <button id="new-chat-btn" class="btn-new-chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          New Chat
+        </button>
+      </div>
+
+      <!-- Scrollable list of past conversations -->
+      <div id="chat-list" class="chat-history">
+        <!-- Chat items injected dynamically via app.js -->
+        <div class="shimmer-wrapper">
+          <div class="shimmer-line" style="width: 80%"></div>
+          <div class="shimmer-line" style="width: 90%"></div>
+          <div class="shimmer-line" style="width: 70%"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div id="user-display" class="user-info">Guest User</div>
+        <button id="logout-btn" class="btn-logout" title="Log Out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. Main Chat Pane Layout -->
+    <main class="chat-workspace">
+      <!-- Top header layout -->
+      <header class="chat-header">
+        <div class="header-meta">
+          <h2 id="active-chat-title">Local Workspace</h2>
+        </div>
+        
+        <div class="header-actions">
+          <select id="model-select" class="model-selector" title="Select LLM model">
+            <!-- Dynamic list of tags injected via app.js -->
+            <option value="">Detecting Models...</option>
+          </select>
+
+          <button id="settings-toggle-btn" class="btn-settings-toggle" title="Model Configuration Parameters">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dynamic parameters adjustments slide cabinet -->
+      <section id="settings-drawer" class="settings-drawer">
+        <h4 style="font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.5rem;">Inference Options</h4>
+        
+        <div class="settings-group">
+          <div class="settings-label-row">
+            <span>Temperature</span>
+            <span id="temp-val">0.7</span>
+          </div>
+          <input 
+            type="range" 
+            id="temperature-slider" 
+            class="settings-slider" 
+            min="0.0" 
+            max="1.0" 
+            step="0.05" 
+            value="0.7"
+          >
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label-row">
+            <span>Max Length</span>
+            <span id="tokens-val">2048</span>
+          </div>
+          <input 
+            type="range" 
+            id="max-tokens-slider" 
+            class="settings-slider" 
+            min="128" 
+            max="4096" 
+            step="128" 
+            value="2048"
+          >
+        </div>
+      </section>
+
+      <!-- Scrollable Message Bubble Window -->
+      <section id="messages-log" class="messages-log">
+        <!-- Welcoming placeholder -->
+        <div class="empty-chat-state">
+          <h3>Welcome to Antigravity Local Inference</h3>
+          <p>Please select a conversation from the sidebar or click "New Chat" to begin streaming prompts to your local Ollama LLM weight models.</p>
+        </div>
+      </section>
+
+      <!-- Text Inputs Sticky Dock -->
+      <footer class="input-dock">
+        <div class="input-container">
+          <textarea 
+            id="chat-input" 
+            class="input-textarea" 
+            placeholder="Type your message... (Shift+Enter for new line)" 
+            disabled
+          ></textarea>
+          <button id="send-btn" class="btn-send" disabled title="Send Prompt">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <!-- auth.js verification runs first to secure workspace routes redirection -->
+  <script>
+    const token = localStorage.getItem("jwt_token");
+    if (!token) {
+      window.location.href = "login.html";
+    }
+  </script>
+  <script src="js/app.js"></script>
+</body>
+</html>
