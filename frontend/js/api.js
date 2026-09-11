@@ -17,7 +17,7 @@ async function defRequest(endpoint, options = {}) {
     ...options,
     headers,
   };
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
